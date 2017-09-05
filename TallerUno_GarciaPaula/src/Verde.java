@@ -2,6 +2,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 public class Verde extends Jugador {
+	
 	private Thread hilov;
 	private PImage arenaFinal;
 

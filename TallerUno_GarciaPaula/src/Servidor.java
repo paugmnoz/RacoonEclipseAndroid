@@ -1,6 +1,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Observable;
@@ -10,9 +11,13 @@ public class Servidor extends Observable implements Runnable {
 	// declaro el servidor y el socket para la conexion con el cliente
 	private ServerSocket ss;
 	private Socket s;
+	private MulticastSocket ms;
 
 	private Verde v;
 	private Morado m;
+	
+	//para sincronizar los personajes
+	private boolean esperando;
 
 	// declaro la bandeja de entrada y salida de mensajes
 	private DataInputStream entrada;
@@ -25,6 +30,10 @@ public class Servidor extends Observable implements Runnable {
 	public Servidor(Verde v, Morado m) {
 		this.v = v;
 		this.m = m;
+		
+		esperando = false;
+		conectado = false;
+		
 		try {
 			ss = new ServerSocket(puerto);
 			System.out.println("--------Inicio Servidor-------");

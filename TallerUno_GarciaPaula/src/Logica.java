@@ -14,6 +14,8 @@ public class Logica implements Observer {
 	private PGraphics arena;
 	private Verde v;
 	private Morado m;
+	
+	private Splash splash;
 
 	Servidor serv;
 
@@ -43,6 +45,8 @@ public class Logica implements Observer {
 
 		v = new Verde(this, 100, 600, app);
 		m = new Morado(this, 1100, 600, app);
+		
+		splash = new Splash(app.random(100,1100),app.random(100,600), app);
 
 		arena = app.createGraphics(1200, 700);
 		arena.beginDraw();
@@ -60,7 +64,8 @@ public class Logica implements Observer {
 		app.image(arena, x, y);
 		v.pintar();
 		m.pintar();
-
+		
+		splash.pintar();
 		pixeles();
 	}
 
