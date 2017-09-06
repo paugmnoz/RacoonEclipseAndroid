@@ -33,5 +33,13 @@ public abstract class Item implements Runnable {
 	public void setActivado(boolean activado) {
 		this.activado = activado;
 	}
+	
+	public float getX() {
+		return x;
+	}
+	
+	public float getY() {
+		return y;
+	}
 
 }

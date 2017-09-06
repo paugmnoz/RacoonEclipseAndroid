@@ -6,7 +6,7 @@ import processing.core.PApplet;
 public class MainRacoon extends PApplet {
 
 	private Logica app;
-
+	private Thread ipHilo;
 
 	public static void main(String[] args) {
 		PApplet.main("MainRacoon");
@@ -18,7 +18,8 @@ public class MainRacoon extends PApplet {
 
 	public void setup() {
 		app = new Logica(this);
-		
+		ipHilo = new Thread(app);
+		ipHilo.start();
 	}
 
 	public void draw() {

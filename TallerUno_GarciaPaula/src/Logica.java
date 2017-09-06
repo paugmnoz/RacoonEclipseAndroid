@@ -1,3 +1,6 @@
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -5,7 +8,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
-public class Logica implements Observer {
+public class Logica implements Observer, Runnable {
 
 	private PApplet app;
 	private PImage arenaD, arenaV, arenaM;
@@ -14,15 +17,22 @@ public class Logica implements Observer {
 	private PGraphics arena;
 	private Verde v;
 	private Morado m;
-	
-	private Splash splash;
+
+	private ArrayList<Splash> splashs;
+	private ArrayList<Boost> boosts;
 
 	Servidor serv;
+
+	private ArrayList<String> ips;
+	private byte[] ip;
+
+	int itemSelect = 0;
 
 	public Logica(PApplet app) {
 		this.app = app;
 		iniciarServidor();
 		inicializarVariables();
+		obtenerIps();
 		cargarImagenes();
 	}
 
@@ -36,7 +46,13 @@ public class Logica implements Observer {
 
 	}
 
-	public Logica() {
+	public void obtenerIps() {
+		ips = new ArrayList<String>();
+		try {
+			ip = InetAddress.getLocalHost().getAddress();
+		} catch (UnknownHostException e) {
+			return;
+		}
 	}
 
 	private void inicializarVariables() {
@@ -45,8 +61,10 @@ public class Logica implements Observer {
 
 		v = new Verde(this, 100, 600, app);
 		m = new Morado(this, 1100, 600, app);
-		
-		splash = new Splash(app.random(100,1100),app.random(100,600), app);
+
+		splashs = new ArrayList<Splash>();
+		boosts = new ArrayList<Boost>();
+		// splash = new Splash(app.random(100,1100),app.random(100,600), app);
 
 		arena = app.createGraphics(1200, 700);
 		arena.beginDraw();
@@ -59,14 +77,85 @@ public class Logica implements Observer {
 		arenaD = app.loadImage("../data/default.png");
 	}
 
+	public void run() {
+
+		for (int i = 0; i <= 255; i++) {
+			final int j = i;
+
+			try {
+				ip[3] = (byte) j;
+				InetAddress address = InetAddress.getByAddress(ip);
+
+				String ipObject = address.toString().substring(1);
+				if (address.isReachable(5000)) {
+					if ((splashs.size() + boosts.size()) < 30) {
+						boosts.add(new Boost(app.random(100, 1100), app.random(100, 600), app));
+
+						itemSelect = (int) app.random(1, 3);
+						System.out.println(itemSelect + "RANDOM NUMBER");
+					}
+					// System.out.println(ipObject + " is on the network");
+					// System.out.println(ips.size() + " networks quantity");
+				} else {
+					System.out.println(ipObject + "NOT");
+					if (splashs.size() > 0 | +boosts.size() > 0) {
+						// splashs.remove(splashs.size() - 1);
+
+						boosts.remove(boosts.size() - 1);
+					}
+				}
+				Thread.sleep(1000);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			switch (itemSelect) {
+			case 0:
+
+				break;
+
+			case 1:
+				boosts.add(new Boost(app.random(100, 1100), app.random(100, 600), app));
+
+				break;
+			case 2:
+				splashs.add(new Splash(app.random(100, 1100), app.random(100, 600), app));
+
+				break;
+			}
+		}
+	}
+
 	public void mostrar() {
 		app.image(arenaD, x, y);
 		app.image(arena, x, y);
+		
+		for (int i = 0; i < splashs.size(); i++) {
+			splashs.get(i).pintar();
+		}
+
+		for (int i = 0; i < boosts.size(); i++) {
+			boosts.get(i).pintar();
+		}
 		v.pintar();
 		m.pintar();
+
 		
-		splash.pintar();
+
 		pixeles();
+		validarCercaniaItemsPersonaje();
+
+	}
+
+	public void validarCercaniaItemsPersonaje() {
+		for (int i = 0; i < splashs.size(); i++) {
+
+			if (PApplet.dist(v.getX(), v.getY(), splashs.get(i).getX(), splashs.get(i).getY()) < 50) {
+				splashs.get(i).setActivado(true);
+				splashs.remove(i);
+			}
+
+		}
 	}
 
 	public void pixeles() {
@@ -97,7 +186,7 @@ public class Logica implements Observer {
 						if (!v.quieto) {
 							v.setPuntaje(v.getPuntaje() + 1);
 						}
-						System.out.println(v.getPuntaje() + "PUNTAJEEEEEEE");
+						// System.out.println(v.getPuntaje() + "PUNTAJEEEEEEE");
 
 					}
 				}
@@ -224,14 +313,6 @@ public class Logica implements Observer {
 			v.setaIz(false);
 		}
 
-		/*
-		 * switch (mensaje) { case "A": v.setArriba(true); break; case "AD":
-		 * v.setaDer(true); break; case "D": v.setDer(true); break; case "AbD":
-		 * v.setAbDer(true); break; case "Ab": v.setAbajo(true); break; case "AbI":
-		 * v.setAbIz(true); break; case "Iz": v.setIzq(true); break; case "AI":
-		 * v.setaIz(true); break; case "C": v.setQuieto(true); break; case "Nada":
-		 * v.setQuieto(true); break; default: break; }
-		 */
 	}
 
 	public void setArena(PGraphics arena) {
@@ -245,4 +326,5 @@ public class Logica implements Observer {
 	public PImage getArenaD() {
 		return arenaD;
 	}
+
 }
