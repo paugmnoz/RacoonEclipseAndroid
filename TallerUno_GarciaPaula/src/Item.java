@@ -28,7 +28,7 @@ public abstract class Item implements Runnable {
 		}
 	}
 
-	public abstract void efectoPersonaje();
+	public abstract void efectoPersonaje(float _x, float _y);
 
 	public void setActivado(boolean activado) {
 		this.activado = activado;

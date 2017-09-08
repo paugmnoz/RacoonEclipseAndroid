@@ -35,7 +35,9 @@ public class Boost extends Item {
 	}
 
 	@Override
-	public void efectoPersonaje() {
+	public void efectoPersonaje(float _x, float _y) {
+
 	}
+
 
 }

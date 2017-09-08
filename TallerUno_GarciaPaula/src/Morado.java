@@ -36,12 +36,59 @@ public class Morado extends Jugador{
 	}
 
 	public void mover() {
+		if (x <= app.width - 50 && x >= 50 && y <= app.height - 50 && y >= 50) {
+			if (arriba) {
+				_y = -2;
+				y += _y;
+				x = x;
+			} else if (aDer) {
+				_y = -2;
+				_x = 2;
+				x += _x;
+				y += _y;
+			} else if (der) {
+				y = y;
+				_x = 2;
+				x += _x;
+			} else if (abDer) {
+				_y = 2;
+				_x = 2;
+				x += _x;
+				y += _y;
+			} else if (abajo) {
+				_y = 2;
+				x = x;
+				y += _y;
+			} else if (abIz) {
+				_y = 2;
+				_x = -2;
+				x += _x;
+				y += _y;
+			} else if (Izq) {
+				_x = -2;
+				x += _x;
+				y = y;
+			} else if (aIz) {
+				_x = -2;
+				_y = -2;
+				x += _x;
+				y += _y;
+			}
 
+			else if (quieto) {
+				x = x;
+				y = y;
+			}
+		} else {
+			x=x;
+			y=y;
+		}
 	}
 
 	public void run() {
 		while (true) {
 			animacion();
+			mover();
 			try {
 				Thread.sleep(16);
 			} catch (InterruptedException e) {

@@ -2,16 +2,17 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 public class Splash extends Item {
+
 	private Thread splash;
-	
+
 	public Splash(float x, float y, PApplet app) {
 		super(x, y, app);
-		
+
 		item = new PImage[8];
 		for (int i = 0; i < item.length; i++) {
 			item[i] = app.loadImage("../data/Splash/Splash_" + i + ".png");
 		}
-		
+
 		splash = new Thread(this);
 		splash.start();
 	}
@@ -33,8 +34,8 @@ public class Splash extends Item {
 	}
 
 	@Override
-	public void efectoPersonaje() {
-		
+	public void efectoPersonaje(float _x, float _y) {
+
 	}
 
 }

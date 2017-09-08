@@ -17,14 +17,19 @@ public class Logica implements Observer, Runnable {
 	private PGraphics arena;
 	private Verde v;
 	private Morado m;
-
-	private ArrayList<Splash> splashs;
-	private ArrayList<Boost> boosts;
+	
+	private int id;
+	private String direccion;
+	
+	private ArrayList<Item> items;
 
 	Servidor serv;
 
 	private ArrayList<String> ips;
+
 	private byte[] ip;
+
+	private HiloServidor controladorCliente;
 
 	int itemSelect = 0;
 
@@ -37,9 +42,7 @@ public class Logica implements Observer, Runnable {
 	}
 
 	public void iniciarServidor() {
-		serv = new Servidor(v, m);
-		// le aviso que siempre esté pendiente
-		serv.addObserver(this);
+		serv = new Servidor(this);
 
 		Thread t = new Thread(serv);
 		t.start();
@@ -62,9 +65,7 @@ public class Logica implements Observer, Runnable {
 		v = new Verde(this, 100, 600, app);
 		m = new Morado(this, 1100, 600, app);
 
-		splashs = new ArrayList<Splash>();
-		boosts = new ArrayList<Boost>();
-		// splash = new Splash(app.random(100,1100),app.random(100,600), app);
+		items = new ArrayList<Item>();
 
 		arena = app.createGraphics(1200, 700);
 		arena.beginDraw();
@@ -88,20 +89,17 @@ public class Logica implements Observer, Runnable {
 
 				String ipObject = address.toString().substring(1);
 				if (address.isReachable(5000)) {
-					if ((splashs.size() + boosts.size()) < 30) {
-						boosts.add(new Boost(app.random(100, 1100), app.random(100, 600), app));
-
+					if (items.size() < 30) {
+						items.add(new Boost(app.random(100, 1100), app.random(100, 600), app));
 						itemSelect = (int) app.random(1, 3);
-						System.out.println(itemSelect + "RANDOM NUMBER");
+						// System.out.println(itemSelect + "RANDOM NUMBER");
 					}
 					// System.out.println(ipObject + " is on the network");
 					// System.out.println(ips.size() + " networks quantity");
 				} else {
-					System.out.println(ipObject + "NOT");
-					if (splashs.size() > 0 | +boosts.size() > 0) {
-						// splashs.remove(splashs.size() - 1);
-
-						boosts.remove(boosts.size() - 1);
+					// System.out.println(ipObject + "NOT");
+					if (!items.isEmpty()) {
+						items.remove(0);
 					}
 				}
 				Thread.sleep(1000);
@@ -109,17 +107,18 @@ public class Logica implements Observer, Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			switch (itemSelect) {
 			case 0:
 
 				break;
 
 			case 1:
-				boosts.add(new Boost(app.random(100, 1100), app.random(100, 600), app));
+				items.add(new Boost(app.random(100, 1100), app.random(100, 600), app));
 
 				break;
 			case 2:
-				splashs.add(new Splash(app.random(100, 1100), app.random(100, 600), app));
+				items.add(new Splash(app.random(100, 1100), app.random(100, 600), app));
 
 				break;
 			}
@@ -129,18 +128,13 @@ public class Logica implements Observer, Runnable {
 	public void mostrar() {
 		app.image(arenaD, x, y);
 		app.image(arena, x, y);
-		
-		for (int i = 0; i < splashs.size(); i++) {
-			splashs.get(i).pintar();
+
+		for (int i = 0; i < items.size(); i++) {
+			items.get(i).pintar();
 		}
 
-		for (int i = 0; i < boosts.size(); i++) {
-			boosts.get(i).pintar();
-		}
 		v.pintar();
 		m.pintar();
-
-		
 
 		pixeles();
 		validarCercaniaItemsPersonaje();
@@ -148,14 +142,23 @@ public class Logica implements Observer, Runnable {
 	}
 
 	public void validarCercaniaItemsPersonaje() {
-		for (int i = 0; i < splashs.size(); i++) {
+		for (int i = 0; i < items.size(); i++) {
 
-			if (PApplet.dist(v.getX(), v.getY(), splashs.get(i).getX(), splashs.get(i).getY()) < 50) {
-				splashs.get(i).setActivado(true);
-				splashs.remove(i);
+			Item it = items.get(i);
+
+			if (PApplet.dist(v.getX(), v.getY(), it.getX(), it.getY()) < 50) {
+				if (it instanceof Splash) {
+					System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
+					it.setActivado(true);
+				} else if (it instanceof Boost) {
+					System.out.println("he tocado boooooossst");
+					it.setActivado(true);
+				}
+				items.remove(i);
 			}
 
 		}
+
 	}
 
 	public void pixeles() {
@@ -203,114 +206,209 @@ public class Logica implements Observer, Runnable {
 
 	@Override
 	public void update(Observable o, Object arg) {
+		this.controladorCliente = (HiloServidor) o;
+
 		String mensaje = (String) arg;
+		
+		if (mensaje.contains("dir")) {
+			System.out.println("Hola soy Raccon verde");
 
-		if (mensaje.equals("A")) {
-			v.setArriba(true);
-			v.setaDer(false);
-			v.setDer(false);
-			v.setAbDer(false);
-			v.setAbajo(false);
-			v.setAbIz(false);
-			v.setIzq(false);
-			v.setaIz(false);
-			v.setQuieto(false);
-		} else if (mensaje.equals("AD")) {
-			v.setaDer(true);
-			v.setDer(false);
-			v.setArriba(false);
-			v.setAbDer(false);
-			v.setAbajo(false);
-			v.setAbIz(false);
-			v.setIzq(false);
-			v.setQuieto(false);
-			v.setaIz(false);
-		} else if (mensaje.equals("D")) {
-			v.setDer(true);
-			v.setArriba(false);
-			v.setaDer(false);
-			v.setAbDer(false);
-			v.setAbajo(false);
-			v.setAbIz(false);
-			v.setIzq(false);
-			v.setaIz(false);
-			v.setQuieto(false);
+			String [] partes = mensaje.split(":");
+			id = Integer.parseInt(partes [1]);
+			direccion = partes[2];
+			if (id == 1) {
+				if (direccion.equals("A")) {
+					v.setArriba(true);
+					v.setaDer(false);
+					v.setDer(false);
+					v.setAbDer(false);
+					v.setAbajo(false);
+					v.setAbIz(false);
+					v.setIzq(false);
+					v.setaIz(false);
+					v.setQuieto(false);
+				} else if (direccion.equals("AD")) {
+					v.setaDer(true);
+					v.setDer(false);
+					v.setArriba(false);
+					v.setAbDer(false);
+					v.setAbajo(false);
+					v.setAbIz(false);
+					v.setIzq(false);
+					v.setQuieto(false);
+					v.setaIz(false);
+				} else if (direccion.equals("D")) {
+					v.setDer(true);
+					v.setArriba(false);
+					v.setaDer(false);
+					v.setAbDer(false);
+					v.setAbajo(false);
+					v.setAbIz(false);
+					v.setIzq(false);
+					v.setaIz(false);
+					v.setQuieto(false);
 
-		} else if (mensaje.equals("AbD")) {
-			v.setQuieto(false);
-			v.setAbDer(true);
-			v.setArriba(false);
-			v.setaDer(false);
-			v.setDer(false);
-			v.setAbajo(false);
-			v.setAbIz(false);
-			v.setIzq(false);
-			v.setaIz(false);
+				} else if (direccion.equals("AbD")) {
+					v.setQuieto(false);
+					v.setAbDer(true);
+					v.setArriba(false);
+					v.setaDer(false);
+					v.setDer(false);
+					v.setAbajo(false);
+					v.setAbIz(false);
+					v.setIzq(false);
+					v.setaIz(false);
 
-		} else if (mensaje.equals("Ab")) {
-			v.setQuieto(false);
-			v.setAbajo(true);
-			v.setArriba(false);
-			v.setaDer(false);
-			v.setDer(false);
-			v.setAbDer(false);
-			v.setAbIz(false);
-			v.setIzq(false);
-			v.setaIz(false);
+				} else if (direccion.equals("Ab")) {
+					v.setQuieto(false);
+					v.setAbajo(true);
+					v.setArriba(false);
+					v.setaDer(false);
+					v.setDer(false);
+					v.setAbDer(false);
+					v.setAbIz(false);
+					v.setIzq(false);
+					v.setaIz(false);
 
-		} else if (mensaje.equals("AbI")) {
-			v.setQuieto(false);
-			v.setAbIz(true);
-			v.setArriba(false);
-			v.setaDer(false);
-			v.setDer(false);
-			v.setAbDer(false);
-			v.setAbajo(false);
-			v.setIzq(false);
-			v.setaIz(false);
+				} else if (direccion.equals("AbI")) {
+					v.setQuieto(false);
+					v.setAbIz(true);
+					v.setArriba(false);
+					v.setaDer(false);
+					v.setDer(false);
+					v.setAbDer(false);
+					v.setAbajo(false);
+					v.setIzq(false);
+					v.setaIz(false);
 
-		} else if (mensaje.equals("Iz")) {
-			v.setIzq(true);
-			v.setArriba(false);
-			v.setaDer(false);
-			v.setDer(false);
-			v.setAbDer(false);
-			v.setQuieto(false);
-			v.setAbIz(false);
-			v.setAbajo(false);
-			v.setaIz(false);
-		} else if (mensaje.equals("AI")) {
-			v.setQuieto(false);
-			v.setaIz(true);
-			v.setArriba(false);
-			v.setaDer(false);
-			v.setDer(false);
-			v.setAbDer(false);
-			v.setAbajo(false);
-			v.setAbIz(false);
-			v.setIzq(false);
+				} else if (direccion.equals("Iz")) {
+					v.setIzq(true);
+					v.setArriba(false);
+					v.setaDer(false);
+					v.setDer(false);
+					v.setAbDer(false);
+					v.setQuieto(false);
+					v.setAbIz(false);
+					v.setAbajo(false);
+					v.setaIz(false);
+				} else if (direccion.equals("AI")) {
+					v.setQuieto(false);
+					v.setaIz(true);
+					v.setArriba(false);
+					v.setaDer(false);
+					v.setDer(false);
+					v.setAbDer(false);
+					v.setAbajo(false);
+					v.setAbIz(false);
+					v.setIzq(false);
 
-		} else if (mensaje.equals("C")) {
-			v.setQuieto(true);
-			v.setArriba(false);
-			v.setaDer(false);
-			v.setDer(false);
-			v.setAbDer(false);
-			v.setAbajo(false);
-			v.setAbIz(false);
-			v.setIzq(false);
-			v.setaIz(false);
+				} else if (direccion.equals("C") || direccion.equals("Nada")) {
+					v.setQuieto(true);
+					v.setArriba(false);
+					v.setaDer(false);
+					v.setDer(false);
+					v.setAbDer(false);
+					v.setAbajo(false);
+					v.setAbIz(false);
+					v.setIzq(false);
+					v.setaIz(false);
+				} 
+			} else if (id == 2) {
+				if (direccion.equals("A")) {
+					m.setArriba(true);
+					m.setaDer(false);
+					m.setDer(false);
+					m.setAbDer(false);
+					m.setAbajo(false);
+					m.setAbIz(false);
+					m.setIzq(false);
+					m.setaIz(false);
+					m.setQuieto(false);
+				} else if (direccion.equals("AD")) {
+					m.setaDer(true);
+					m.setDer(false);
+					m.setArriba(false);
+					m.setAbDer(false);
+					m.setAbajo(false);
+					m.setAbIz(false);
+					m.setIzq(false);
+					m.setQuieto(false);
+					m.setaIz(false);
+				} else if (direccion.equals("D")) {
+					m.setDer(true);
+					m.setArriba(false);
+					m.setaDer(false);
+					m.setAbDer(false);
+					m.setAbajo(false);
+					m.setAbIz(false);
+					m.setIzq(false);
+					m.setaIz(false);
+					m.setQuieto(false);
 
-		} else if (mensaje.equals("Nada")) {
-			v.setQuieto(true);
-			v.setArriba(false);
-			v.setaDer(false);
-			v.setDer(false);
-			v.setAbDer(false);
-			v.setAbajo(false);
-			v.setAbIz(false);
-			v.setIzq(false);
-			v.setaIz(false);
+				} else if (direccion.equals("AbD")) {
+					m.setQuieto(false);
+					m.setAbDer(true);
+					m.setArriba(false);
+					m.setaDer(false);
+					m.setDer(false);
+					m.setAbajo(false);
+					m.setAbIz(false);
+					m.setIzq(false);
+					m.setaIz(false);
+				} else if (direccion.equals("Ab")) {
+					m.setQuieto(false);
+					m.setAbajo(true);
+					m.setArriba(false);
+					m.setaDer(false);
+					m.setDer(false);
+					m.setAbDer(false);
+					m.setAbIz(false);
+					m.setIzq(false);
+					m.setaIz(false);
+
+				} else if (direccion.equals("AbI")) {
+					m.setQuieto(false);
+					m.setAbIz(true);
+					m.setArriba(false);
+					m.setaDer(false);
+					m.setDer(false);
+					m.setAbDer(false);
+					m.setAbajo(false);
+					m.setIzq(false);
+					m.setaIz(false);
+				} else if (direccion.equals("Iz")) {
+					m.setIzq(true);
+					m.setArriba(false);
+					m.setaDer(false);
+					m.setDer(false);
+					m.setAbDer(false);
+					m.setQuieto(false);
+					m.setAbIz(false);
+					m.setAbajo(false);
+					m.setaIz(false);
+				} else if (direccion.equals("AI")) {
+					m.setQuieto(false);
+					m.setaIz(true);
+					m.setArriba(false);
+					m.setaDer(false);
+					m.setDer(false);
+					m.setAbDer(false);
+					m.setAbajo(false);
+					m.setAbIz(false);
+					m.setIzq(false);
+
+				} else if (direccion.equals("C") || direccion.equals("Nada")) {
+					m.setQuieto(true);
+					m.setArriba(false);
+					m.setaDer(false);
+					m.setDer(false);
+					m.setAbDer(false);
+					m.setAbajo(false);
+					m.setAbIz(false);
+					m.setIzq(false);
+					m.setaIz(false);
+				} 
+			}
 		}
 
 	}
