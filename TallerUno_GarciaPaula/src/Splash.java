@@ -5,8 +5,8 @@ public class Splash extends Item {
 
 	private Thread splash;
 
-	public Splash(float x, float y, PApplet app) {
-		super(x, y, app);
+	public Splash(float x, float y, PApplet app, Logica ref) {
+		super(x, y, app, ref);
 
 		item = new PImage[8];
 		for (int i = 0; i < item.length; i++) {
@@ -34,8 +34,8 @@ public class Splash extends Item {
 	}
 
 	@Override
-	public void efectoPersonaje(float _x, float _y) {
-
+	public void efectoPersonaje(Jugador uno) {
+	
 	}
 
 }

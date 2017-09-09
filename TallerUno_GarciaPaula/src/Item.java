@@ -8,11 +8,13 @@ public abstract class Item implements Runnable {
 	protected int numFrame;
 	protected PImage item[];
 	protected boolean activado;
+	protected Logica ref;
 
-	public Item(float x, float y, PApplet app) {
+	public Item(float x, float y, PApplet app, Logica ref) {
 		this.x = x;
 		this.y = y;
 		this.app = app;
+		this.ref = ref;
 
 		activado = false;
 	}
@@ -28,7 +30,7 @@ public abstract class Item implements Runnable {
 		}
 	}
 
-	public abstract void efectoPersonaje(float _x, float _y);
+	public abstract void efectoPersonaje(Jugador uno);
 
 	public void setActivado(boolean activado) {
 		this.activado = activado;
@@ -41,5 +43,7 @@ public abstract class Item implements Runnable {
 	public float getY() {
 		return y;
 	}
-
+	public boolean isActivado() {
+		return activado;
+	}
 }

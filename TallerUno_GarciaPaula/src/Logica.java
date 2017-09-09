@@ -17,10 +17,10 @@ public class Logica implements Observer, Runnable {
 	private PGraphics arena;
 	private Verde v;
 	private Morado m;
-	
+
 	private int id;
 	private String direccion;
-	
+
 	private ArrayList<Item> items;
 
 	Servidor serv;
@@ -29,9 +29,13 @@ public class Logica implements Observer, Runnable {
 
 	private byte[] ip;
 
+	private int numVerdes;
+	private int numAzules;
+
 	private HiloServidor controladorCliente;
 
 	int itemSelect = 0;
+	public boolean puntaje;
 
 	public Logica(PApplet app) {
 		this.app = app;
@@ -72,6 +76,8 @@ public class Logica implements Observer, Runnable {
 		arena.background(255, 255, 255, 0);
 		arena.endDraw();
 
+		puntaje = false;
+
 	}
 
 	private void cargarImagenes() {
@@ -85,12 +91,14 @@ public class Logica implements Observer, Runnable {
 
 			try {
 				ip[3] = (byte) j;
+
 				InetAddress address = InetAddress.getByAddress(ip);
 
 				String ipObject = address.toString().substring(1);
+
 				if (address.isReachable(5000)) {
 					if (items.size() < 30) {
-						items.add(new Boost(app.random(100, 1100), app.random(100, 600), app));
+						// items.add(new Boost(app.random(100, 1100), app.random(100, 600), app, this));
 						itemSelect = (int) app.random(1, 3);
 						// System.out.println(itemSelect + "RANDOM NUMBER");
 					}
@@ -114,11 +122,11 @@ public class Logica implements Observer, Runnable {
 				break;
 
 			case 1:
-				items.add(new Boost(app.random(100, 1100), app.random(100, 600), app));
+				items.add(new Boost(app.random(100, 1100), app.random(100, 600), app, this));
 
 				break;
 			case 2:
-				items.add(new Splash(app.random(100, 1100), app.random(100, 600), app));
+				items.add(new Splash(app.random(100, 1100), app.random(100, 600), app, this));
 
 				break;
 			}
@@ -138,15 +146,33 @@ public class Logica implements Observer, Runnable {
 
 		pixeles();
 		validarCercaniaItemsPersonaje();
+		contarPixeles();
 
 	}
-
+	
+	//para validar la recoleccion de items 
 	public void validarCercaniaItemsPersonaje() {
 		for (int i = 0; i < items.size(); i++) {
 
 			Item it = items.get(i);
-
+			
+			//si con el personaje verde paso cerca
 			if (PApplet.dist(v.getX(), v.getY(), it.getX(), it.getY()) < 50) {
+				//si es splash
+				if (it instanceof Splash) {
+					System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
+					//activar el poder
+					it.setActivado(true);
+					//llamar el metodo que realizara la funcion del item
+					splash(it.getX(), it.getY(), "verde", it);
+				} else if (it instanceof Boost) {
+					it.setActivado(true);
+					it.efectoPersonaje(v);
+					System.out.println("he tocado boooooossst");
+					
+				}
+				items.remove(i);
+			} else if (PApplet.dist(m.getX(), m.getY(), it.getX(), it.getY()) < 50) {
 				if (it instanceof Splash) {
 					System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
 					it.setActivado(true);
@@ -161,13 +187,62 @@ public class Logica implements Observer, Runnable {
 
 	}
 
+	public void splash(float f, float h, String quien, Item item) {
+		float sx = f;
+		float sy = h;
+		Item ite = item;
+		String quienToco = quien;
+		while (ite.isActivado()) {
+			PImage arenaRef = v.getArenaRef();
+			PImage arenaRefDos = m.getArenaMorada();
+			arena.loadPixels();
+			arenaRef.loadPixels();
+			arenaRefDos.loadPixels();
+
+			for (int py = 0; py < arena.height; py++) {
+				for (int px = 0; px < arena.width; px++) {
+
+					int i = px + (py * arena.width);
+
+					if (PApplet.dist(sx, sy, px, py) < 150) {
+
+						float r = app.red(arena.pixels[i]);
+						float g = app.green(arena.pixels[i]);
+						float b = app.blue(arena.pixels[i]);
+
+						float _r = app.red(arenaRef.pixels[i]);
+						float _g = app.green(arenaRef.pixels[i]);
+						float _b = app.blue(arenaRef.pixels[i]);
+
+						float mr = app.red(arenaRefDos.pixels[i]);
+						float mg = app.green(arenaRefDos.pixels[i]);
+						float mb = app.blue(arenaRefDos.pixels[i]);
+						if (quienToco.equals("verde")) {
+							arena.pixels[i] = app.color(_r, _g, _b);
+
+						} else if (quienToco.equals("morado")) {
+							arena.pixels[i] = app.color(mr, mg, mb);
+						}
+					}
+				}
+			}
+			arena.updatePixels();
+			ite.setActivado(false);
+		}
+	}
+
 	public void pixeles() {
 
 		vx = v.getX();
 		vy = v.getY();
+
+		float mx = m.getX();
+		float my = m.getY();
 		PImage arenaRef = v.getArenaRef();
+		PImage arenaRefDos = m.getArenaMorada();
 		arena.loadPixels();
 		arenaRef.loadPixels();
+		arenaRefDos.loadPixels();
 
 		for (int py = 0; py < arena.height; py++) {
 			for (int px = 0; px < arena.width; px++) {
@@ -192,11 +267,54 @@ public class Logica implements Observer, Runnable {
 						// System.out.println(v.getPuntaje() + "PUNTAJEEEEEEE");
 
 					}
+				} else if (PApplet.dist(mx, my, px, py) < 50) {
+
+					float r = app.red(arena.pixels[i]);
+					float g = app.green(arena.pixels[i]);
+					float b = app.blue(arena.pixels[i]);
+
+					float mr = app.red(arenaRefDos.pixels[i]);
+					float mg = app.green(arenaRefDos.pixels[i]);
+					float mb = app.blue(arenaRefDos.pixels[i]);
+
+					if (r != mr || g != mg || b != mb) {
+						arena.pixels[i] = app.color(mr, mg, mb);
+						if (!m.quieto) {
+							m.setPuntaje(v.getPuntaje() + 1);
+						}
+						// System.out.println(v.getPuntaje() + "PUNTAJEEEEEEE");
+					}
 				}
 			}
 		}
 
 		arena.updatePixels();
+
+	}
+
+	public void contarPixeles() {
+
+		while (puntaje) {
+			app.colorMode(PApplet.HSB, 360, 100, 100);
+			for (int py = 0; py < arena.height; py++) {
+				for (int px = 0; px < arena.width; px++) {
+
+					int i = px + (py * arena.width);
+					float h = app.hue(arena.pixels[i]);
+					float s = app.saturation(arena.pixels[i]);
+					float b = app.brightness(arena.pixels[i]);
+
+					if (h > 155 && s > 80 && b > 90) {
+						numVerdes++;
+					} else if (h > 245 && s > 67 && b > 93) {
+						numAzules++;
+					}
+				}
+			}
+			System.out.println("Numero de pixeles " + numVerdes);
+			System.out.println("Numero de pixeles MORADOS " + numAzules);
+			app.colorMode(PApplet.RGB);
+		}
 
 	}
 
@@ -209,12 +327,12 @@ public class Logica implements Observer, Runnable {
 		this.controladorCliente = (HiloServidor) o;
 
 		String mensaje = (String) arg;
-		
-		if (mensaje.contains("dir")) {
-			System.out.println("Hola soy Raccon verde");
 
-			String [] partes = mensaje.split(":");
-			id = Integer.parseInt(partes [1]);
+		if (mensaje.contains("dir")) {
+		//	System.out.println("Hola soy Raccon verde");
+
+			String[] partes = mensaje.split(":");
+			id = Integer.parseInt(partes[1]);
 			direccion = partes[2];
 			if (id == 1) {
 				if (direccion.equals("A")) {
@@ -312,7 +430,7 @@ public class Logica implements Observer, Runnable {
 					v.setAbIz(false);
 					v.setIzq(false);
 					v.setaIz(false);
-				} 
+				}
 			} else if (id == 2) {
 				if (direccion.equals("A")) {
 					m.setArriba(true);
@@ -407,7 +525,7 @@ public class Logica implements Observer, Runnable {
 					m.setAbIz(false);
 					m.setIzq(false);
 					m.setaIz(false);
-				} 
+				}
 			}
 		}
 

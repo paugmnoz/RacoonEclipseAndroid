@@ -63,51 +63,51 @@ public class Verde extends Jugador {
 	public void pintar() {
 
 		if (arriba) {
-			app.image(mapache[numFrame], x + boost, y + boost);
-			_y = -2;
+			app.image(mapache[numFrame], x , y );
+			_y = -2 - boost;
 			y += _y;
-			x = x;
+			x = x ;
 		} else if (aDer) {
-			app.image(mAD[numFrame], x + boost, y + boost);
-			_y = -1;
-			_x = 1;
+			app.image(mAD[numFrame], x, y );
+			_y = -1 - boost;
+			_x = 1 + boost;
 			x += _x;
 			y += _y;
 		} else if (der) {
-			app.image(mD[numFrame], x + boost, y + boost);
+			app.image(mD[numFrame], x , y );
 			y = y;
-			_x = 2;
+			_x = 2 + boost;
 			x += _x;
 		} else if (abDer) {
-			app.image(mDA[numFrame], x + boost, y + boost);
-			_y = 1;
-			_x = 1;
+			app.image(mDA[numFrame], x , y);
+			_y = 1 + boost;
+			_x = 1 + boost;
 			x += _x;
 			y += _y;
 		} else if (abajo) {
-			app.image(mAB[numFrame], x + boost, y + boost);
-			_y = 2;
-			x = x;
+			app.image(mAB[numFrame], x, y );
+			_y = 2 + boost;
+			x = x ;
 			y += _y;
 		} else if (abIz) {
-			app.image(mAIz[numFrame], x + boost, y + boost);
-			_y = 1;
-			_x = -1;
+			app.image(mAIz[numFrame], x, y);
+			_y = 1 + boost;
+			_x = -1 - boost;
 			x += _x;
 			y += _y;
 		} else if (Izq) {
-			app.image(mIz[numFrame], x + boost, y + boost);
-			_x = -2;
-			x += _x;
-			y = y;
+			app.image(mIz[numFrame], x , y );
+			_x = -2 + boost;
+			x += _x ;
+			y = y ;
 		} else if (aIz) {
-			app.image(mIzA[numFrame], x + boost, y + boost);
-			_x = -1;
-			_y = -1;
+			app.image(mIzA[numFrame], x, y );
+			_x = -1 - boost;
+			_y = -1 - boost;
 			x += _x;
 			y += _y;
 		} else if (quieto) {
-			app.image(mapache[numFrame], x + boost, y + boost);
+			app.image(mapache[numFrame], x , y );
 			x = x;
 			y = y;
 		}
@@ -219,11 +219,5 @@ public class Verde extends Jugador {
 		}
 	}
 
-	public void moverPersonajeVerde(final String mensaje) {
-		this.mensaje = mensaje;
-		if (mensaje.equals("A")) {
-			_y = -4;
-		}
-	}
 
 }

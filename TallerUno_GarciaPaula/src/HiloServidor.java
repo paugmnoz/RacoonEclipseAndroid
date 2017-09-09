@@ -34,7 +34,7 @@ public class HiloServidor extends Observable implements Runnable {
 
 		while (conectado) {
 			try {
-				System.out.println("-----Esperando Mensaje----");
+			//	System.out.println("-----Esperando Mensaje----");
 				// para recibir los mensajes del cliente
 				recibirMensaje();
 				Thread.sleep(16);
@@ -83,9 +83,9 @@ public class HiloServidor extends Observable implements Runnable {
 		String mensaje;
 		try {
 			mensaje = entrada.readUTF();
-			System.out.println("-----Recibi Mensaje------");
+		//	System.out.println("-----Recibi Mensaje------");
 			// validar el mensaje que llego
-			System.out.println("direccion " + mensaje);
+		//	System.out.println("direccion " + mensaje);
 
 			setChanged();
 			notifyObservers(mensaje);

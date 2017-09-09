@@ -3,6 +3,7 @@ import processing.core.PImage;
 
 public class Morado extends Jugador{
 	private Thread hilov;
+	private PImage arenaMorada;
 
 	public Morado(Logica ref, float x, float y, PApplet app) {
 		super(ref, x, y, app);
@@ -19,6 +20,9 @@ public class Morado extends Jugador{
 		for (int i = 0; i < mapache.length; i++) {
 			mapache[i] = app.loadImage("../data/RM/RM_" + i + ".png");
 		}
+		
+		
+		arenaMorada = app.loadImage("../data/m.png");
 	}
 
 	public void pintar() {
@@ -95,6 +99,9 @@ public class Morado extends Jugador{
 				e.printStackTrace();
 			}
 		}
+	}
+	public PImage getArenaMorada() {
+		return arenaMorada;
 	}
 
 }

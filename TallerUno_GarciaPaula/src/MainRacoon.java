@@ -31,6 +31,8 @@ public class MainRacoon extends PApplet {
 		app.pantallas();
 	}
 
-
+	public void exit() {
+		//app.contarPixeles();
+	}
 
 }

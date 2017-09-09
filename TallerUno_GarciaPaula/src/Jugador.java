@@ -36,16 +36,12 @@ public abstract class Jugador extends Observable implements Runnable {
 		quieto = true;
 	}
 
-	public void Jugador() {
-
-	}
-
 	// método para visualizar los personajes
 	public abstract void pintar();
 
 	// método para mover cada personaje
 	public abstract void mover();
-
+	
 	public float getX() {
 		return x;
 	}
@@ -112,6 +108,10 @@ public abstract class Jugador extends Observable implements Runnable {
 
 	public void setPuntaje(int puntaje) {
 		this.puntaje = puntaje;
+	}
+	
+	public int getBoost() {
+		return boost;
 	}
 	
 
