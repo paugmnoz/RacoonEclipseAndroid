@@ -54,9 +54,10 @@ public class Boost extends Item {
 			if (player instanceof Verde) {
 				System.out.println("FUE JUGADOR VERDE");
 				player.setBoost(3);
-				
+			} else if (player instanceof Morado) {
+				System.out.println("FUE JUGADOR MORADO");
+				player.setBoost(3);
 			}
-
 		}
 	}
 

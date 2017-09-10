@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import jogamp.opengl.GLBufferObjectTracker.CreateStorageDispatch;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
@@ -23,6 +25,8 @@ public class Logica implements Observer, Runnable {
 
 	private ArrayList<Item> items;
 
+	private PFont fuente;
+
 	Servidor serv;
 
 	private ArrayList<String> ips;
@@ -31,6 +35,9 @@ public class Logica implements Observer, Runnable {
 
 	private int numVerdes;
 	private int numAzules;
+	
+	//Para el tiempo
+	private int min, s;
 
 	private HiloServidor controladorCliente;
 
@@ -75,7 +82,11 @@ public class Logica implements Observer, Runnable {
 		arena.beginDraw();
 		arena.background(255, 255, 255, 0);
 		arena.endDraw();
+		
+		 min = 1;
+		 s = 30;
 
+		fuente = app.loadFont("../data/FredokaOne-Regular-50.vlw");
 		puntaje = false;
 
 	}
@@ -147,38 +158,66 @@ public class Logica implements Observer, Runnable {
 		pixeles();
 		validarCercaniaItemsPersonaje();
 		contarPixeles();
+		tiempo();
 
 	}
-	
-	//para validar la recoleccion de items 
+
+	private void tiempo() {
+
+		app.textFont(fuente, 50);
+		
+		//app.textMode(PApplet.CENTER);
+		
+
+		if (app.frameCount % 60 == 0) {
+			if (s<=59) {
+				s--;
+			}
+		}
+		if (s==0) {
+			s=59;
+			min--;
+		}
+		if (s>= 10) {
+			app.text(min + ":" + s, x-50, 100);
+		} else if (s<10) {
+			app.text(min + ":0" + s, x-50, 100);
+		}
+		
+	}
+
+	// para validar la recoleccion de items
 	public void validarCercaniaItemsPersonaje() {
 		for (int i = 0; i < items.size(); i++) {
 
 			Item it = items.get(i);
-			
-			//si con el personaje verde paso cerca
+
+			// si con el personaje verde paso cerca
 			if (PApplet.dist(v.getX(), v.getY(), it.getX(), it.getY()) < 50) {
-				//si es splash
+				// si es splash
 				if (it instanceof Splash) {
 					System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
-					//activar el poder
+					// activar el poder
 					it.setActivado(true);
-					//llamar el metodo que realizara la funcion del item
+					// llamar el metodo que realizara la funcion del item
 					splash(it.getX(), it.getY(), "verde", it);
 				} else if (it instanceof Boost) {
 					it.setActivado(true);
 					it.efectoPersonaje(v);
 					System.out.println("he tocado boooooossst");
-					
+
 				}
 				items.remove(i);
 			} else if (PApplet.dist(m.getX(), m.getY(), it.getX(), it.getY()) < 50) {
 				if (it instanceof Splash) {
 					System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
 					it.setActivado(true);
+					splash(it.getX(), it.getY(), "morado", it);
+
 				} else if (it instanceof Boost) {
 					System.out.println("he tocado boooooossst");
 					it.setActivado(true);
+					it.efectoPersonaje(m);
 				}
 				items.remove(i);
 			}
@@ -329,7 +368,7 @@ public class Logica implements Observer, Runnable {
 		String mensaje = (String) arg;
 
 		if (mensaje.contains("dir")) {
-		//	System.out.println("Hola soy Raccon verde");
+			// System.out.println("Hola soy Raccon verde");
 
 			String[] partes = mensaje.split(":");
 			id = Integer.parseInt(partes[1]);

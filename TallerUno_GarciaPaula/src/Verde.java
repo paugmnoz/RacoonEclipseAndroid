@@ -2,7 +2,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 public class Verde extends Jugador {
-	
+
 	private Thread hilov;
 	private PImage arenaFinal;
 
@@ -63,53 +63,33 @@ public class Verde extends Jugador {
 	public void pintar() {
 
 		if (arriba) {
-			app.image(mapache[numFrame], x , y );
-			_y = -2 - boost;
-			y += _y;
-			x = x ;
+			app.image(mapache[numFrame], x, y);
+
 		} else if (aDer) {
-			app.image(mAD[numFrame], x, y );
-			_y = -1 - boost;
-			_x = 1 + boost;
-			x += _x;
-			y += _y;
+			app.image(mAD[numFrame], x, y);
+
 		} else if (der) {
-			app.image(mD[numFrame], x , y );
-			y = y;
-			_x = 2 + boost;
-			x += _x;
+			app.image(mD[numFrame], x, y);
+
 		} else if (abDer) {
-			app.image(mDA[numFrame], x , y);
-			_y = 1 + boost;
-			_x = 1 + boost;
-			x += _x;
-			y += _y;
+			app.image(mDA[numFrame], x, y);
+
 		} else if (abajo) {
-			app.image(mAB[numFrame], x, y );
-			_y = 2 + boost;
-			x = x ;
+			app.image(mAB[numFrame], x, y);
+
 			y += _y;
 		} else if (abIz) {
 			app.image(mAIz[numFrame], x, y);
-			_y = 1 + boost;
-			_x = -1 - boost;
-			x += _x;
-			y += _y;
+
 		} else if (Izq) {
-			app.image(mIz[numFrame], x , y );
-			_x = -2 + boost;
-			x += _x ;
-			y = y ;
+			app.image(mIz[numFrame], x, y);
+
 		} else if (aIz) {
-			app.image(mIzA[numFrame], x, y );
-			_x = -1 - boost;
-			_y = -1 - boost;
-			x += _x;
-			y += _y;
+			app.image(mIzA[numFrame], x, y);
+
 		} else if (quieto) {
-			app.image(mapache[numFrame], x , y );
-			x = x;
-			y = y;
+			app.image(mapache[numFrame], x, y);
+
 		}
 	}
 
@@ -124,53 +104,48 @@ public class Verde extends Jugador {
 	}
 
 	public void mover() {
-		if (x <= app.width - 50 && x >= 50 && y <= app.height - 50 && y >= 50) {
+	//	if (x <= app.width - 50 && x >= 50 && y <= app.height - 50 && y >= 50) {
 			if (arriba) {
-				_y = -2;
+				_y = -4 - boost;
 				y += _y;
 				x = x;
 			} else if (aDer) {
-				_y = -2;
-				_x = 2;
+				_y = -3 - boost;
+				_x = 3 + boost;
 				x += _x;
 				y += _y;
 			} else if (der) {
 				y = y;
-				_x = 2;
+				_x = 3 + boost;
 				x += _x;
 			} else if (abDer) {
-				_y = 2;
-				_x = 2;
+				_y = 3 + boost;
+				_x = 3 + boost;
 				x += _x;
 				y += _y;
 			} else if (abajo) {
-				_y = 2;
+				_y = 3 + boost;
 				x = x;
 				y += _y;
 			} else if (abIz) {
-				_y = 2;
-				_x = -2;
+				_y = 3 + boost;
+				_x = -3 - boost;
 				x += _x;
 				y += _y;
 			} else if (Izq) {
-				_x = -2;
+				_x = -3 - boost;
 				x += _x;
 				y = y;
 			} else if (aIz) {
-				_x = -2;
-				_y = -2;
+				_x = -3 - boost;
+				_y = -3 - boost;
 				x += _x;
 				y += _y;
-			}
-
-			else if (quieto) {
+			} else if (quieto) {
 				x = x;
 				y = y;
 			}
-		} else {
-			x=x;
-			y=y;
-		}
+	//)	}
 	}
 
 	public void pintarArena() {
@@ -196,7 +171,7 @@ public class Verde extends Jugador {
 
 					if (r != _r || g != _g || b != _b) {
 						arenaFinal.pixels[i] = app.color(_r, _g, _b);
-						
+
 					}
 				}
 			}
@@ -218,6 +193,5 @@ public class Verde extends Jugador {
 			}
 		}
 	}
-
 
 }
