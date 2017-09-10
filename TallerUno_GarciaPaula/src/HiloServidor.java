@@ -128,5 +128,7 @@ public class HiloServidor extends Observable implements Runnable {
 	public void setConectado(boolean conectado) {
 		this.conectado = conectado;
 	}
+	
+
 
 }

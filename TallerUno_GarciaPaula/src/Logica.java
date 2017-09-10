@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import ddf.minim.AudioPlayer;
+import ddf.minim.AudioSample;
+import ddf.minim.Minim;
 import jogamp.opengl.GLBufferObjectTracker.CreateStorageDispatch;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -13,12 +16,17 @@ import processing.core.PImage;
 public class Logica implements Observer, Runnable {
 
 	private PApplet app;
-	private PImage arenaD, arenaV, arenaM;
+	private PImage arenaD, arenaV, arenaM, fondogris, botonplay, how, go, temp;
+	private PImage inicio[], ins[], ganV[], ganM, score[];
 	private float x, y, vx, vy;
 
 	private PGraphics arena;
 	private Verde v;
 	private Morado m;
+
+	private Minim minim;
+	private AudioSample splashAudio;
+	private AudioPlayer music, back, points;
 
 	private int id;
 	private String direccion;
@@ -32,24 +40,39 @@ public class Logica implements Observer, Runnable {
 	private ArrayList<String> ips;
 
 	private byte[] ip;
+	private boolean jugando;
 
 	private int numVerdes;
 	private int numAzules;
-	
-	//Para el tiempo
-	private int min, s;
+
+	// Para el tiempo
+	private int min, s, jugadores;
+	private int pantalla, numFrame, resetpuntaje;
 
 	private HiloServidor controladorCliente;
 
 	int itemSelect = 0;
 	public boolean puntaje;
 
-	public Logica(PApplet app) {
+	public Logica(PApplet app, Minim minim) {
 		this.app = app;
-		iniciarServidor();
+		this.minim = minim;
 		inicializarVariables();
 		obtenerIps();
 		cargarImagenes();
+		cargarAudios();
+	}
+
+	private void cargarAudios() {
+		splashAudio = minim.loadSample("../data/splash.mp3", 512);
+		if (splashAudio != null) {
+			System.out.println("splashAudio" + splashAudio);
+		}
+
+		music = minim.loadFile("../data/music.mp3", 512);
+		back = minim.loadFile("../data/back.mp3", 512);
+		points = minim.loadFile("../data/points.mp3", 512);
+
 	}
 
 	public void iniciarServidor() {
@@ -82,49 +105,71 @@ public class Logica implements Observer, Runnable {
 		arena.beginDraw();
 		arena.background(255, 255, 255, 0);
 		arena.endDraw();
-		
-		 min = 1;
-		 s = 30;
+
+		min = 0;
+		s = 59;
 
 		fuente = app.loadFont("../data/FredokaOne-Regular-50.vlw");
 		puntaje = false;
+
+		numFrame = 0;
 
 	}
 
 	private void cargarImagenes() {
 		arenaD = app.loadImage("../data/default.png");
+
+		inicio = new PImage[15];
+		for (int i = 0; i < inicio.length; i++) {
+			inicio[i] = app.loadImage("../data/Animaciones/Inicio/Inicio_" + i + ".png");
+		}
+
+		ins = new PImage[42];
+		for (int i = 0; i < ins.length; i++) {
+			ins[i] = app.loadImage("../data/Animaciones/Ins/Ins_" + i + ".png");
+		}
+		score = new PImage[10];
+		for (int i = 0; i < score.length; i++) {
+			score[i] = app.loadImage("../data/Animaciones/score 2/score 2_" + i + ".png");
+		}
+		fondogris = app.loadImage("../data/F.png");
+		botonplay = app.loadImage("../data/Button.png");
+		how = app.loadImage("../data/how.png");
+		go = app.loadImage("../data/go.png");
+		temp = app.loadImage("../data/temp.png");
 	}
 
 	public void run() {
+		while (jugando) {
+			for (int i = 0; i <= 255; i++) {
+				final int j = i;
 
-		for (int i = 0; i <= 255; i++) {
-			final int j = i;
+				try {
+					ip[3] = (byte) j;
 
-			try {
-				ip[3] = (byte) j;
+					InetAddress address = InetAddress.getByAddress(ip);
 
-				InetAddress address = InetAddress.getByAddress(ip);
+					String ipObject = address.toString().substring(1);
 
-				String ipObject = address.toString().substring(1);
-
-				if (address.isReachable(5000)) {
-					if (items.size() < 30) {
-						// items.add(new Boost(app.random(100, 1100), app.random(100, 600), app, this));
-						itemSelect = (int) app.random(1, 3);
-						// System.out.println(itemSelect + "RANDOM NUMBER");
+					if (address.isReachable(5000)) {
+						if (items.size() < 30) {
+							// items.add(new Boost(app.random(100, 1100), app.random(100, 600), app, this));
+							itemSelect = (int) app.random(1, 3);
+							// System.out.println(itemSelect + "RANDOM NUMBER");
+						}
+						// System.out.println(ipObject + " is on the network");
+						// System.out.println(ips.size() + " networks quantity");
+					} else {
+						// System.out.println(ipObject + "NOT");
+						if (!items.isEmpty()) {
+							items.remove(0);
+						}
 					}
-					// System.out.println(ipObject + " is on the network");
-					// System.out.println(ips.size() + " networks quantity");
-				} else {
-					// System.out.println(ipObject + "NOT");
-					if (!items.isEmpty()) {
-						items.remove(0);
-					}
+					Thread.sleep(1000);
+
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				Thread.sleep(1000);
-
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 
 			switch (itemSelect) {
@@ -145,45 +190,128 @@ public class Logica implements Observer, Runnable {
 	}
 
 	public void mostrar() {
-		app.image(arenaD, x, y);
-		app.image(arena, x, y);
+		back.play();
+		switch (pantalla) {
 
-		for (int i = 0; i < items.size(); i++) {
-			items.get(i).pintar();
+		// --------------Pantalla de Inicio----------------------
+		case 0:
+			app.image(fondogris, x, y);
+			app.image(inicio[numFrame], x, y);
+			if (app.frameCount % 4 == 0) {
+				numFrame++;
+				if (numFrame >= inicio.length) {
+					numFrame = 14;
+				}
+			}
+			if (PApplet.dist(app.mouseX, app.mouseY, 607, 466) < 50) {
+				app.image(botonplay, x, y);
+			} else if (app.mouseX >= 552 && app.mouseY >= 583 && app.mouseX <= 682 && app.mouseY <= 603) {
+				app.image(how, x, y);
+			}
+			break;
+
+		// --------------Pantalla de Instrucciones----------------------
+		case 1:
+			app.image(arenaD, x, y);
+			app.image(arena, x, y);
+
+			if (serv.getClientes().size() == 1) {
+				v.pintar();
+				app.text("1:00", x - 50, 100);
+			} else if (serv.getClientes().size() == 2) {
+				for (int i = 0; i < items.size(); i++) {
+					items.get(i).pintar();
+				}
+				v.pintar();
+				m.pintar();
+				back.close();
+				music.play();
+				pixeles();
+				validarCercaniaItemsPersonaje();
+				tiempo();
+				/*
+				 * if (app.frameCount % 600 == 0) { puntaje = true; contarPixeles();
+				 * System.out.println("puntaje verde" + numVerdes);
+				 * System.out.println("puntaje morado" + numAzules); puntaje = false; }
+				 */
+
+			}
+
+			break;
+		// --------------Pantalla de Juego----------------------
+		case 2:
+			app.image(ins[numFrame], x, y);
+			if (app.frameCount % 5 == 0) {
+				numFrame++;
+				if (numFrame >= inicio.length) {
+					numFrame = 41;
+				}
+			}
+
+			if (app.mouseX >= 714 && app.mouseY >= 571 && app.mouseX <= 894 && app.mouseY <= 629) {
+				app.image(go, x, y);
+			}
+			break;
+
+		// --------------Pantalla de Puntaje----------------------
+		case 3:
+			app.image(temp, x, y);
+			points.play();
+			app.image(fondogris, x, y);
+			app.image(score[numFrame], x, y);
+			if (app.frameCount % 4 == 0) {
+				numFrame++;
+				if (numFrame >= score.length) {
+					numFrame = 9;
+				}
+			}
+
+			break;
+
+		// --------------Pantalla de Ganador----------------------
+
+		case 4:
+			break;
 		}
-
-		v.pintar();
-		m.pintar();
-
-		pixeles();
-		validarCercaniaItemsPersonaje();
-		contarPixeles();
-		tiempo();
 
 	}
 
 	private void tiempo() {
-
 		app.textFont(fuente, 50);
-		
-		//app.textMode(PApplet.CENTER);
-		
 
-		if (app.frameCount % 60 == 0) {
-			if (s<=59) {
-				s--;
+		if (app.frameCount % 61 == 0) {
+			if (s <= 59 && s > 0) {
+				if (serv.getClientes().size() == 2) {
+					s--;
+					min = 0;
+				}
 			}
 		}
-		if (s==0) {
-			s=59;
-			min--;
+
+		if (min == 0 && s == 0) {
+			System.out.println("puntaje" + puntaje);
+			puntaje = true;
+			System.out.println("puntaje" + puntaje);
+			contarPixeles();
+			puntaje = false;
+			System.out.println("puntaje" + puntaje);
 		}
-		if (s>= 10) {
-			app.text(min + ":" + s, x-50, 100);
-		} else if (s<10) {
-			app.text(min + ":0" + s, x-50, 100);
+		if (s == 0) {
+			if (app.frameCount % 61 == 0) {
+				s = -1;
+			}
 		}
-		
+		vertiempo();
+	}
+
+	private void vertiempo() {
+		if (s >= 10) {
+			app.text(min + ":" + s, x - 50, 100);
+		} else if (s < 10 && s > 0) {
+			app.text(min + ":0" + s, x - 50, 100);
+		} else if (s < 0) {
+			app.text(" ", x - 50, 100);
+		}
 	}
 
 	// para validar la recoleccion de items
@@ -196,26 +324,29 @@ public class Logica implements Observer, Runnable {
 			if (PApplet.dist(v.getX(), v.getY(), it.getX(), it.getY()) < 50) {
 				// si es splash
 				if (it instanceof Splash) {
-					System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
+					// System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
 					// activar el poder
 					it.setActivado(true);
+					splashAudio.trigger();
+
 					// llamar el metodo que realizara la funcion del item
 					splash(it.getX(), it.getY(), "verde", it);
 				} else if (it instanceof Boost) {
 					it.setActivado(true);
 					it.efectoPersonaje(v);
-					System.out.println("he tocado boooooossst");
+					// System.out.println("he tocado boooooossst");
 
 				}
 				items.remove(i);
 			} else if (PApplet.dist(m.getX(), m.getY(), it.getX(), it.getY()) < 50) {
 				if (it instanceof Splash) {
-					System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
+					// System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
 					it.setActivado(true);
+					splashAudio.trigger();
 					splash(it.getX(), it.getY(), "morado", it);
 
 				} else if (it instanceof Boost) {
-					System.out.println("he tocado boooooossst");
+					// System.out.println("he tocado boooooossst");
 					it.setActivado(true);
 					it.efectoPersonaje(m);
 				}
@@ -353,12 +484,34 @@ public class Logica implements Observer, Runnable {
 			System.out.println("Numero de pixeles " + numVerdes);
 			System.out.println("Numero de pixeles MORADOS " + numAzules);
 			app.colorMode(PApplet.RGB);
+			puntaje = false;
+			numFrame = 0;
+			pantalla = 3;
 		}
 
 	}
 
 	public void pantallas() {
+		System.out.println("x" + app.mouseX + "y" + app.mouseY);
+		if (pantalla == 0) {
 
+			if (PApplet.dist(app.mouseX, app.mouseY, 607, 466) < 50) {
+				iniciarServidor();
+
+				pantalla = 1;
+			} else if (app.mouseX >= 552 && app.mouseY >= 583 && app.mouseX <= 682 && app.mouseY <= 603) {
+				numFrame = 0;
+				pantalla = 2;
+			}
+
+		} else if (pantalla == 2) {
+			if (app.mouseX >= 714 && app.mouseY >= 571 && app.mouseX <= 894 && app.mouseY <= 629) {
+				jugando = true;
+				iniciarServidor();
+
+				pantalla = 1;
+			}
+		}
 	}
 
 	@Override

@@ -64,17 +64,17 @@ public class Boost extends Item {
 	public void contartiempo() {
 
 		if (activarContador) {
-			System.out.println("CONTADOR  " + activarContador);
+		//	System.out.println("CONTADOR  " + activarContador);
 			if (app.frameCount % 60 == 0) {
 				contador--;
-				System.out.println("EMPEZO CONTADOR");
-				System.out.println("CONTADOR  " + contador);
+			//	System.out.println("EMPEZO CONTADOR");
+			//	System.out.println("CONTADOR  " + contador);
 				if (contador == 0) {
 					contador = 0;
 					activado = false;
 					activarContador = false;
-					System.out.println("CONTADOR  " + activarContador);
-					System.out.println("EFECTO  " + activado);
+				//	System.out.println("CONTADOR  " + activarContador);
+				//	System.out.println("EFECTO  " + activado);
 					player.setBoost(0);
 					
 				}

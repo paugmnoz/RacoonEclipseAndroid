@@ -1,6 +1,8 @@
 import java.util.Observable;
 import java.util.Observer;
 
+import ddf.minim.AudioSample;
+import ddf.minim.Minim;
 import processing.core.PApplet;
 
 public class MainRacoon extends PApplet {
@@ -8,18 +10,26 @@ public class MainRacoon extends PApplet {
 	private Logica app;
 	private Thread ipHilo;
 
+	private Minim minim;
+
 	public static void main(String[] args) {
 		PApplet.main("MainRacoon");
 	}
 
 	public void settings() {
 		size(1200, 700);
+		
 	}
 
 	public void setup() {
-		app = new Logica(this);
+		minim = new Minim(this);
+
+		app = new Logica(this, minim);
 		ipHilo = new Thread(app);
 		ipHilo.start();
+		
+
+	
 	}
 
 	public void draw() {
@@ -29,6 +39,7 @@ public class MainRacoon extends PApplet {
 
 	public void mouseClicked() {
 		app.pantallas();
+		//splashAudio.trigger();
 	}
 
 	public void exit() {

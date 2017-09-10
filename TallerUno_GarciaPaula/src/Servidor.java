@@ -99,5 +99,9 @@ public class Servidor implements Observer, Runnable {
 		}
 
 	}
+	
+	public ArrayList<HiloServidor> getClientes() {
+		return clientes;
+	}
 
 }
