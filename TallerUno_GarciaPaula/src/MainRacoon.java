@@ -18,18 +18,14 @@ public class MainRacoon extends PApplet {
 
 	public void settings() {
 		size(1200, 700);
-		
 	}
 
 	public void setup() {
 		minim = new Minim(this);
-
 		app = new Logica(this, minim);
 		ipHilo = new Thread(app);
 		ipHilo.start();
-		
 
-	
 	}
 
 	public void draw() {
@@ -39,11 +35,10 @@ public class MainRacoon extends PApplet {
 
 	public void mouseClicked() {
 		app.pantallas();
-		//splashAudio.trigger();
 	}
 
 	public void exit() {
-		//app.contarPixeles();
+		// app.contarPixeles();
 	}
 
 }

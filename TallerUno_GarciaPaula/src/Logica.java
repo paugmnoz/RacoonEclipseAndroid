@@ -281,7 +281,7 @@ public class Logica implements Observer, Runnable {
 			app.text(numAzules/1000, 900, 475);
 			
 			if (numFrame ==9) {
-				if (app.frameCount%700==0) {
+				if (app.frameCount%660==0) {
 					if ((numVerdes/1000) > (numAzules/1000)) {
 						
 						pantalla = 4;
@@ -370,7 +370,6 @@ public class Logica implements Observer, Runnable {
 						// activar el poder
 						it.setActivado(true);
 						splashAudio.trigger();
-
 						// llamar el metodo que realizara la funcion del item
 						splash(it.getX(), it.getY(), "verde", it);
 					} else if (it instanceof Boost) {
@@ -378,7 +377,6 @@ public class Logica implements Observer, Runnable {
 						it.efectoPersonaje(v);
 						boostAudio.trigger();
 						// System.out.println("he tocado boooooossst");
-
 					}
 					items.remove(i);
 				} else if (PApplet.dist(m.getX(), m.getY(), it.getX(), it.getY()) < 50) {
@@ -393,14 +391,10 @@ public class Logica implements Observer, Runnable {
 						it.setActivado(true);
 						it.efectoPersonaje(m);
 						boostAudio.trigger();
-
 					}
 					items.remove(i);
 				}
-
-			
-
-		}
+					}
 
 	}
 
@@ -533,7 +527,12 @@ public class Logica implements Observer, Runnable {
 			app.colorMode(PApplet.RGB);
 			puntaje = false;
 			numFrame = 0;
+
 			pantalla = 3;
+			
+			for (int i = 0; i < serv.getClientes().size(); i++) {
+				serv.getClientes().get(i).setConectado(false);
+			}
 		}
 
 	}
