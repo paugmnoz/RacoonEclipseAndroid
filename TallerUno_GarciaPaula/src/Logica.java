@@ -17,7 +17,7 @@ public class Logica implements Observer, Runnable {
 
 	private PApplet app;
 	private PImage arenaD, arenaV, arenaM, fondogris, botonplay, how, go, temp;
-	private PImage inicio[], ins[], ganV[], ganM, score[];
+	private PImage inicio[], ins[], ganV[], ganM[], score[];
 	private float x, y, vx, vy;
 
 	private PGraphics arena;
@@ -25,7 +25,7 @@ public class Logica implements Observer, Runnable {
 	private Morado m;
 
 	private Minim minim;
-	private AudioSample splashAudio;
+	private AudioSample splashAudio, boostAudio;
 	private AudioPlayer music, back, points;
 
 	private int id;
@@ -47,7 +47,7 @@ public class Logica implements Observer, Runnable {
 
 	// Para el tiempo
 	private int min, s, jugadores;
-	private int pantalla, numFrame, resetpuntaje;
+	private int pantalla, numFrame, numFrameGan;
 
 	private HiloServidor controladorCliente;
 
@@ -72,6 +72,7 @@ public class Logica implements Observer, Runnable {
 		music = minim.loadFile("../data/music.mp3", 512);
 		back = minim.loadFile("../data/back.mp3", 512);
 		points = minim.loadFile("../data/points.mp3", 512);
+		boostAudio = minim.loadSample("../data/boost.mp3", 512);
 
 	}
 
@@ -113,6 +114,7 @@ public class Logica implements Observer, Runnable {
 		puntaje = false;
 
 		numFrame = 0;
+		numFrameGan = 0;
 
 	}
 
@@ -132,6 +134,16 @@ public class Logica implements Observer, Runnable {
 		for (int i = 0; i < score.length; i++) {
 			score[i] = app.loadImage("../data/Animaciones/score 2/score 2_" + i + ".png");
 		}
+		
+		ganV = new PImage[12];
+		for (int i = 0; i < ganV.length; i++) {
+			ganV[i] = app.loadImage("../data/Animaciones/GanadorV/GanadorV_" + i + ".png");
+		}
+		
+		ganM = new PImage[12];
+		for (int i = 0; i < ganM.length; i++) {
+			ganM[i] = app.loadImage("../data/Animaciones/Ganador/Ganador_" + i + ".png");
+		}
 		fondogris = app.loadImage("../data/F.png");
 		botonplay = app.loadImage("../data/Button.png");
 		how = app.loadImage("../data/how.png");
@@ -140,7 +152,6 @@ public class Logica implements Observer, Runnable {
 	}
 
 	public void run() {
-		while (jugando) {
 			for (int i = 0; i <= 255; i++) {
 				final int j = i;
 
@@ -170,7 +181,7 @@ public class Logica implements Observer, Runnable {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
+			
 
 			switch (itemSelect) {
 			case 0:
@@ -265,12 +276,43 @@ public class Logica implements Observer, Runnable {
 					numFrame = 9;
 				}
 			}
+			
+			app.text(numVerdes/1000, 254, 475);
+			app.text(numAzules/1000, 900, 475);
+			
+			if (numFrame ==9) {
+				if (app.frameCount%700==0) {
+					if ((numVerdes/1000) > (numAzules/1000)) {
+						
+						pantalla = 4;
+					} else if ((numVerdes/1000) < (numAzules/1000)) {
+						pantalla = 5;
+					}
+				} 
+			}
 
 			break;
 
 		// --------------Pantalla de Ganador----------------------
 
 		case 4:
+			app.image(ganV[numFrameGan], x, y);
+			if (app.frameCount % 4 == 0) {
+				numFrameGan++;
+				if (numFrameGan >= ganV.length) {
+					numFrameGan = 11;
+				}
+			}
+			break;
+			
+		case 5:
+			app.image(ganM[numFrameGan], x, y);
+			if (app.frameCount % 4 == 0) {
+				numFrameGan++;
+				if (numFrameGan >= ganM.length) {
+					numFrameGan = 11;
+				}
+			}
 			break;
 		}
 
@@ -316,42 +358,47 @@ public class Logica implements Observer, Runnable {
 
 	// para validar la recoleccion de items
 	public void validarCercaniaItemsPersonaje() {
-		for (int i = 0; i < items.size(); i++) {
+			for (int i = 0; i < items.size(); i++) {
 
-			Item it = items.get(i);
+				Item it = items.get(i);
 
-			// si con el personaje verde paso cerca
-			if (PApplet.dist(v.getX(), v.getY(), it.getX(), it.getY()) < 50) {
-				// si es splash
-				if (it instanceof Splash) {
-					// System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
-					// activar el poder
-					it.setActivado(true);
-					splashAudio.trigger();
+				// si con el personaje verde paso cerca
+				if (PApplet.dist(v.getX(), v.getY(), it.getX(), it.getY()) < 50) {
+					// si es splash
+					if (it instanceof Splash) {
+						// System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
+						// activar el poder
+						it.setActivado(true);
+						splashAudio.trigger();
 
-					// llamar el metodo que realizara la funcion del item
-					splash(it.getX(), it.getY(), "verde", it);
-				} else if (it instanceof Boost) {
-					it.setActivado(true);
-					it.efectoPersonaje(v);
-					// System.out.println("he tocado boooooossst");
+						// llamar el metodo que realizara la funcion del item
+						splash(it.getX(), it.getY(), "verde", it);
+					} else if (it instanceof Boost) {
+						it.setActivado(true);
+						it.efectoPersonaje(v);
+						boostAudio.trigger();
+						// System.out.println("he tocado boooooossst");
 
+					}
+					items.remove(i);
+				} else if (PApplet.dist(m.getX(), m.getY(), it.getX(), it.getY()) < 50) {
+					if (it instanceof Splash) {
+						// System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
+						it.setActivado(true);
+						splashAudio.trigger();
+						splash(it.getX(), it.getY(), "morado", it);
+
+					} else if (it instanceof Boost) {
+						// System.out.println("he tocado boooooossst");
+						it.setActivado(true);
+						it.efectoPersonaje(m);
+						boostAudio.trigger();
+
+					}
+					items.remove(i);
 				}
-				items.remove(i);
-			} else if (PApplet.dist(m.getX(), m.getY(), it.getX(), it.getY()) < 50) {
-				if (it instanceof Splash) {
-					// System.out.println("he tocado SPLASHSSSSSSSSSSSSSt");
-					it.setActivado(true);
-					splashAudio.trigger();
-					splash(it.getX(), it.getY(), "morado", it);
 
-				} else if (it instanceof Boost) {
-					// System.out.println("he tocado boooooossst");
-					it.setActivado(true);
-					it.efectoPersonaje(m);
-				}
-				items.remove(i);
-			}
+			
 
 		}
 
