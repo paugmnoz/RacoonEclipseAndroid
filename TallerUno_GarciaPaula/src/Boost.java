@@ -41,7 +41,8 @@ public class Boost extends Item {
 		app.image(item[numFrame], x, y);
 
 	}
-
+	
+	//activo el tiempo para el acelerador
 	@Override
 	public void efectoPersonaje(Jugador uno) {
 		this.player = uno;
@@ -60,7 +61,8 @@ public class Boost extends Item {
 			}
 		}
 	}
-
+	
+	//cuento el tiempo del acelerador
 	public void contartiempo() {
 
 		if (activarContador) {

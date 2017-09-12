@@ -14,7 +14,8 @@ public class Verde extends Jugador {
 		hilov = new Thread(this);
 		hilov.start();
 	}
-
+	
+	//cargo mis imagenes de las vistas del personaje
 	private void cargarimagenes() {
 
 		arenaRef = app.loadImage("../data/v.png");
@@ -77,7 +78,6 @@ public class Verde extends Jugador {
 		} else if (abajo) {
 			app.image(mAB[numFrame], x, y);
 
-			y += _y;
 		} else if (abIz) {
 			app.image(mAIz[numFrame], x, y);
 
@@ -91,61 +91,6 @@ public class Verde extends Jugador {
 			app.image(mapache[numFrame], x, y);
 
 		}
-	}
-
-	// método para animar el personaje
-	public void animacion() {
-		if (app.frameCount % 4 == 0) {
-			numFrame++;
-			if (numFrame >= mapache.length) {
-				numFrame = 0;
-			}
-		}
-	}
-
-	public void mover() {
-	//	if (x <= app.width - 50 && x >= 50 && y <= app.height - 50 && y >= 50) {
-			if (arriba) {
-				_y = -4 - boost;
-				y += _y;
-				x = x;
-			} else if (aDer) {
-				_y = -3 - boost;
-				_x = 3 + boost;
-				x += _x;
-				y += _y;
-			} else if (der) {
-				y = y;
-				_x = 3 + boost;
-				x += _x;
-			} else if (abDer) {
-				_y = 3 + boost;
-				_x = 3 + boost;
-				x += _x;
-				y += _y;
-			} else if (abajo) {
-				_y = 3 + boost;
-				x = x;
-				y += _y;
-			} else if (abIz) {
-				_y = 3 + boost;
-				_x = -3 - boost;
-				x += _x;
-				y += _y;
-			} else if (Izq) {
-				_x = -3 - boost;
-				x += _x;
-				y = y;
-			} else if (aIz) {
-				_x = -3 - boost;
-				_y = -3 - boost;
-				x += _x;
-				y += _y;
-			} else if (quieto) {
-				x = x;
-				y = y;
-			}
-	//)	}
 	}
 
 	public void pintarArena() {

@@ -29,7 +29,8 @@ public abstract class Item implements Runnable {
 			}
 		}
 	}
-
+	
+	//metodo que hara efectivo el poder del item, recibe una referencia del cliente que lo activo
 	public abstract void efectoPersonaje(Jugador uno);
 
 	public void setActivado(boolean activado) {

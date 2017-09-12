@@ -38,10 +38,85 @@ public abstract class Jugador extends Observable implements Runnable {
 
 	// método para visualizar los personajes
 	public abstract void pintar();
-
+	// método para animar el personaje
+	public void animacion() {
+		if (app.frameCount % 4 == 0) {
+			numFrame++;
+			if (numFrame >= mapache.length) {
+				numFrame = 0;
+			}
+		}
+	}
 	// método para mover cada personaje
-	public abstract void mover();
-	
+	public void mover() {
+		// if (x <= app.width - 50 && x >= 50 && y <= app.height - 50 && y >= 50) {
+		if (arriba) {
+			if (y >= 60) {
+				_y = -4 - boost;
+				y += _y;
+				x = x;
+			}
+
+		} else if (aDer) {
+			if (x <= 1140 && y >= 60) {
+				_y = -3 - boost;
+				_x = 3 + boost;
+				x += _x;
+				y += _y;
+			}
+
+		} else if (der) {
+			if (x <= 1140) {
+
+				y = y;
+				_x = 3 + boost;
+				x += _x;
+			}
+		} else if (abDer) {
+			if (x <= 1140 && y <= 640) {
+				_y = 3 + boost;
+				_x = 3 + boost;
+				x += _x;
+				y += _y;
+			}
+		} else if (abajo) {
+			if (y <= 640) {
+				_y = 3 + boost;
+				x = x;
+				y += _y;
+			} else {
+				y =y;
+			}
+		} else if (abIz) {
+			if (x >= 60 && y <= 640) {
+
+				_y = 3 + boost;
+				_x = -3 - boost;
+				x += _x;
+				y += _y;
+			}
+		} else if (Izq) {
+			if (x >= 60) {
+
+				_x = -3 - boost;
+				x += _x;
+				y = y;
+			}
+		} else if (aIz) {
+			if (x >= 60 && y >= 60) {
+
+				_x = -3 - boost;
+				_y = -3 - boost;
+				x += _x;
+				y += _y;
+			}
+		} else if (quieto) {
+			x = x;
+			y = y;
+		}
+		// ) }
+	}
+
 	public float getX() {
 		return x;
 	}

@@ -90,60 +90,6 @@ public class Morado extends Jugador {
 		}
 	}
 
-	// método para animar el personaje
-	public void animacion() {
-		if (app.frameCount % 4 == 0) {
-			numFrame++;
-			if (numFrame >= mapache.length) {
-				numFrame = 0;
-			}
-		}
-	}
-
-	public void mover() {
-	//	if (x <= app.width - 50 && x >= 50 && y <= app.height - 50 && y >= 50) {
-		if (arriba) {
-			_y = -4 - boost;
-			y += _y;
-			x = x;
-		} else if (aDer) {
-			_y = -3 - boost;
-			_x = 3 + boost;
-			x += _x;
-			y += _y;
-		} else if (der) {
-			y = y;
-			_x = 3 + boost;
-			x += _x;
-		} else if (abDer) {
-			_y = 3 + boost;
-			_x = 3 + boost;
-			x += _x;
-			y += _y;
-		} else if (abajo) {
-			_y = 3 + boost;
-			x = x;
-			y += _y;
-		} else if (abIz) {
-			_y = 3 + boost;
-			_x = -3 - boost;
-			x += _x;
-			y += _y;
-		} else if (Izq) {
-			_x = -3 - boost;
-			x += _x;
-			y = y;
-		} else if (aIz) {
-			_x = -3 - boost;
-			_y = -3 - boost;
-			x += _x;
-			y += _y;
-		} else if (quieto) {
-			x = x;
-			y = y;
-		}
-	//	}
-	}
 
 	public void run() {
 		while (true) {

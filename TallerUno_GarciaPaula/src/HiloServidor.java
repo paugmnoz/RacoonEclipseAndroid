@@ -45,7 +45,7 @@ public class HiloServidor extends Observable implements Runnable {
 
 	}
 
-	// Metodo para enviar mensajes al cliente
+	// Metodo para enviar mensajes al cliente recibe el string del mensaje a enviar
 	public void enviarMensaje(String saludo) {
 
 		try {

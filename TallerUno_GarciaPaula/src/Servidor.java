@@ -78,7 +78,8 @@ public class Servidor implements Observer, Runnable {
 		}
 
 	}
-
+	
+	//metodo para recibir el mensaje de conexion y asignar una id al cliente, recibe al cliente y al mensaje
 	@Override
 	public void update(Observable o, Object arg) {
 		HiloServidor controlCliente = (HiloServidor) o;
